@@ -25,6 +25,7 @@
 
 use XML::Parser;
 use File::Basename;
+use File::BaseDir qw(xdg_data_home xdg_config_home); # For Freedesktop.org base directory specification
 
 my $pkgname = 'obrecent';
 my $version = 0.1;
@@ -80,8 +81,8 @@ my %CONFIG = (
 	},
 	with_icons => 1,
 );
-my $xbel_file 	= "$home_dir/.local/share/recently-used.xbel";
-my $config_dir  = "$home_dir/.config/obbrowser";
+my $xbel_file 	= xdg_data_home . "/recently-used.xbel";
+my $config_dir  = xdg_config_home . "/obbrowser";
 my $config_file = "$config_dir/config.pl";
 my %table = (
 	'&' => 'amp',
@@ -96,8 +97,8 @@ my $ld_obj;
 if (not -e $config_file or -z _) {
 	# Create obrecent file configuration.
 	# Create configuration directory if it's necessary
-	$config_dir  = "$home_dir/.config/obrecent";
-	$config_file = "$config_dir/config.pl";
+	$config_dir  = xdg_config_home . "/obrecent";
+	$config_file = "$config_dir/config.pl";	
 	if (not -e $config_file or -z _) {
 		if (not -d $config_dir) {
 			require File::Path;
