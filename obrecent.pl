@@ -17,8 +17,8 @@
 #
 # License: GPLv3
 # Date: 16 June 2015
-# Latest edit: 16 June 2015
-# Website: https://github.com/abbarrasa/obrecent
+# Latest edit: 22 June 2015
+# Website: https://github.com/abbarrasa/openbox
 #
 # A simple Perl script for Openbox which recent documents are displayed through pipe menus.
 # It is based on obbrowser of Trizen. See <https://github.com/trizen/obbrowser>.
