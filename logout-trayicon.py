@@ -1,4 +1,5 @@
-#!/usr/bin/python2
+#! /usr/bin/env python2
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2015 Alberto Buitrago <echo YWJiYXJyYXNhQGdtYWlsLmNvbQo= | base64 -d>
 #
@@ -17,7 +18,7 @@
 #
 # License: GPLv3
 # Date: 22 June 2015
-# Latest edit: 22 June 2015
+# Latest edit: 25 June 2015
 # Website: https://github.com/abbarrasa/openbox
 #
 # A small script to put a logout icon in system tray.
@@ -25,42 +26,57 @@
 
 import gtk
 import os
+import base64
+
+from gtk import gdk
 
 
 class SystrayIcon:
     def __init__(self):
+        self.version = '0.2'
         self.tray = gtk.StatusIcon()
         self.tray.set_from_stock(gtk.STOCK_QUIT)
         self.tray.set_tooltip('Logout TrayIcon')
         self.tray.connect('activate', self.on_activate)
         self.tray.connect('popup-menu', self.on_popup_menu)
 
-    def on_activate(self, data):
+    def on_activate(self, status_icon):
         os.system('oblogout')
 
-    def on_popup_menu(self, status, event_button, event_time):
+    def on_popup_menu(self, status_icon, event_button, event_time):
         menu = gtk.Menu()
 
-        menuitem_about = gtk.MenuItem("About")
-        menu.append(menuitem_about)
-        menuitem_about.connect(
-                "activate", lambda w: self.on_about(self))
+        # add item to show about dialog
+        item_about = gtk.MenuItem('About')
+        menu.append(item_about)
+        item_about.connect(
+                'activate', lambda w: self.show_about_dialog())
 
-        menuitem_quit = gtk.MenuItem("Quit")
-        menu.append(menuitem_quit)
-        menuitem_quit.connect("activate", lambda w: gtk.main_quit())
+        # add quit item
+        item_quit = gtk.MenuItem('Quit')
+        menu.append(item_quit)
+        item_quit.connect('activate', lambda w: gtk.main_quit())
 
         menu.show_all()
         menu.popup(None, None, None, event_button, event_time, self.tray)
 
-    def on_about(self, data):
-        dialog = gtk.AboutDialog()
-        dialog.set_name('Logout TrayIcon')
-        dialog.set_version('0.1')
-        dialog.set_comments('A systray logout icon for Openbox desktop')
-        dialog.set_website('https://github.com/abbarrasa/openbox')
-        dialog.run()
-        dialog.destroy()
+    def show_about_dialog(self):
+        about_dialog = gtk.AboutDialog()
+        about_dialog.set_destroy_with_parent(True)
+        about_dialog.set_program_name('Logout TrayIcon')
+        about_dialog.set_logo(
+            gdk.pixbuf_new_from_file(
+                gtk.icon_theme_get_default().lookup_icon(
+                    'system-shutdown', 48, 0).get_filename()))
+        about_dialog.set_version(self.version)
+        about_dialog.set_copyright("Copyright \xc2\xa9 2015 Alberto Buitrago")
+        about_dialog.set_comments("A systray logout icon for Openbox desktop")
+        about_dialog.set_authors([
+            'Alberto Buitrago <%s>' % base64.b64decode(
+                'YWJiYXJyYXNhQGdtYWlsLmNvbQ==')])
+        about_dialog.set_website('https://github.com/abbarrasa/openbox')
+        about_dialog.run()
+        about_dialog.destroy()
 
 if __name__ == "__main__":
     SystrayIcon()
