@@ -18,7 +18,7 @@
 #
 # License: GPLv3
 # Date: 22 June 2015
-# Latest edit: 25 June 2015
+# Latest edit: 26 June 2015
 # Website: https://github.com/abbarrasa/openbox
 #
 # A small script to put a logout icon in system tray.
