@@ -72,7 +72,7 @@ class SystrayIcon:
                     'system-shutdown', 48, 0).get_filename()))
         about_dialog.set_icon(
             about_dialog.render_icon(
-                gtk.STOCK_ABOUT, gtk.ICON_SIZE_SMALL_TOOLBAR))
+                gtk.STOCK_ABOUT, gtk.ICON_SIZE_DIALOG))
         about_dialog.set_version(self._VERSION)
         about_dialog.set_copyright("Copyright \xc2\xa9 2015 Alberto Buitrago")
         about_dialog.set_comments("A systray logout icon for Openbox desktop")
