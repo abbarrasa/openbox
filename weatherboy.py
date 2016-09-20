@@ -18,7 +18,7 @@
 #
 # License: GPLv2
 # Date: 13 May 2016
-# Latest edit: 13 May 2016
+# Latest edit: 20 Sep 2016
 # Website: https://github.com/abbarrasa/openbox
 #
 # A review of Weatherboy to integrate this application with the new
@@ -34,11 +34,11 @@ from argparse import ArgumentParser
 import gobject
 import gtk
 import json
-import time
 import urllib
 import urllib2
 import webbrowser
 from decimal import Decimal
+from datetime import datetime, time
 
 # Yahoo! Weather YQL API
 WEATHER_WEBSITE = 'https://www.yahoo.com/news/weather'
@@ -162,6 +162,7 @@ class MainApp:
         atmosphere = data['query']['results']['channel']['atmosphere']
         astronomy = data['query']['results']['channel']['astronomy']
         forecast = data['query']['results']['channel']['item']['forecast']
+
         return {
             'current': {
                 'code': condition['code'],
@@ -180,8 +181,8 @@ class MainApp:
                     'pressure': '{0} {1}'.format(atmosphere['pressure'], units['pressure'])
                 },
                 'astronomy': {
-                    'sunrise': u'\u2600 {0}'.format(astronomy['sunrise']),
-                    'sunset': u'\u263E {0}'.format(astronomy['sunset'])
+                    'sunrise': u'\u2600 {0:%R}'.format(self.to_time(astronomy['sunrise'])),
+                    'sunset': u'\u263E {0:%R}'.format(self.to_time(astronomy['sunset']))                    
                 }
             },
             'forecast': forecast,
@@ -189,7 +190,7 @@ class MainApp:
                 'city': location['city'],
                 'country': location['country']
             },
-            'timeStamp': time.strftime("%Y-%m-%d %H:%M")
+            'timeStamp': datetime.today().strftime('%Y-%m-%d %H:%M')
         }		
 
     def update_tray(self):
@@ -240,11 +241,10 @@ class MainApp:
             vbox = gtk.VBox()
             header = gtk.Label()
             header.set_markup(
-                              '<u><b>{0}, {1}</b></u>'.format(self.weather['location']['city'], self.weather['location']['country']))
-            header.set_alignment(1.0, 0.5)
+                              '<span size="12000"><b>{0}, {1}</b></span>'.format(self.weather['location']['city'], self.weather['location']['country']))
+            header.set_alignment(0.9, 0.5)
             footer = gtk.Label()
             footer.set_markup('<small><i>Last checked: {0}</i></small>'.format(self.weather['timeStamp']))
-            separator_h = gtk.HSeparator()
             hbox = gtk.HBox()
             now_icon = self.get_image_by_icon(self.weather['current']['icon'])
             now_label = gtk.Label()
@@ -253,13 +253,13 @@ class MainApp:
             table = gtk.Table(columns=2, homogeneous=False)
             u = 0
             l = 1
-            for k, v in self.weather['extra'].iteritems():
+            for k, v in self.weather['extra'].items():
                 h_label = gtk.Label()
                 h_label.set_markup('<b>{0}</b>'.format(k))
                 h_label.set_alignment(0.0, 0.5)
-                h_label.set_padding(5, 0)
+                h_label.set_padding(5, 5)
                 table.attach(h_label, 0, 1, u, l)
-                for i, j in v.iteritems():
+                for i, j in sorted(v.items()):
                     u += 1
                     l += 1
                     k_label = gtk.Label(i)
@@ -274,10 +274,10 @@ class MainApp:
             hbox.pack_start(now_icon, False, False, 0)
             hbox.pack_start(now_label, False, False, 0)
             vbox.pack_start(header, True, False, 0)
-            vbox.pack_start(separator_h, False, False, 0)
             vbox.pack_start(hbox, False, False, 0)
             vbox.pack_start(table, False, False, 0)
-            vbox.pack_start(footer, False, False, 0)
+            vbox.pack_start(gtk.HSeparator(), False, False, 5)            
+            vbox.pack_start(footer, False, False, 3)
             vbox.show_all()
             tooltip.set_custom(vbox)
 		
@@ -309,9 +309,16 @@ class MainApp:
         elif 292.5 <= value < 337.5:
             return u'\u2198 (NW)'
         else:
-            return u'\u2193 (N)'	  
+            return u'\u2193 (N)'
 
-							
+    def  to_time(self, value):
+        t, p = value.split(' ')
+        h, m = map(int, t.split(':'))
+        if p.lower() == 'pm':
+            h +=12
+        return time(h, m)
+	
+
 if __name__ == "__main__":
     try:
         args = parse_arguments()
