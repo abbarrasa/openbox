@@ -31,7 +31,7 @@
 # Example of use: python3 weatherboy-qt.py -l 751846 -u c -d 30 -a
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QSystemTrayIcon, QGridLayout, QMenu, QAction, QStyle, qApp, QLabel, QLineEdit, QPushButton, QDialog, QGridLayout, QHBoxLayout, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QSystemTrayIcon, QGridLayout, QMenu, QAction, QStyle, qApp, QLabel, QLineEdit, QPushButton, QDialog, QGridLayout, QHBoxLayout, QLabel, QVBoxLayout, QDialogButtonBox
 from argparse import ArgumentParser
 import urllib.request
 import urllib.parse
@@ -255,12 +255,16 @@ class MainApp(QMainWindow):
             city_label = QLabel('<font size="5"><b>{0}, {1}</b></font>'.format(data['location']['city'], data['location']['country']))
             lastchecked_label = QLabel('<small><i>Last checked at: {0}</i></small>'.format(data['timestamp']))
 
+            buttons = QDialogButtonBox(QDialogButtonBox.Ok, QtCore.Qt.Horizontal, dialog)
+            buttons.accepted.connect(dialog.accept)
+
             layout = QVBoxLayout()
             layout.addStretch(2)
             layout.addWidget(city_label)
             layout.addLayout(today_layout)
             layout.addLayout(forecast_layout)
             layout.addWidget(lastchecked_label)
+            layout.addWidget(buttons)
             dialog.setLayout(layout)
 
             dialog.show()
