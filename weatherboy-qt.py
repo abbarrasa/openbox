@@ -223,7 +223,6 @@ class MainApp(QMainWindow):
             conditions_layout.addWidget(pressure)
             conditions_layout.addWidget(sunrise)
             conditions_layout.addWidget(sunset)
-            conditions_layout.addStretch()
 
             today_layout = QHBoxLayout()
             today_layout.addWidget(icon_label)
@@ -246,7 +245,6 @@ class MainApp(QMainWindow):
                 dateforecast_layout.addWidget(text)
                 dateforecast_layout.addWidget(high)
                 dateforecast_layout.addWidget(low)
-                dateforecast_layout.addStretch()
                 if column < 5:
                     row = 0
                 else:
@@ -258,6 +256,7 @@ class MainApp(QMainWindow):
             lastchecked_label = QLabel('<small><i>Last checked at: {0}</i></small>'.format(data['timestamp']))
 
             layout = QVBoxLayout()
+            layout.addStretch(2)
             layout.addWidget(city_label)
             layout.addLayout(today_layout)
             layout.addLayout(forecast_layout)
