@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Simple weather applet
+Comment=Simple weather applet
+Exec=weatherboy-qt.py -l 22664159 -u c -d 30 -a
+Terminal=false
+Type=Application
+Icon=indicator-weather
+Categories=Qt;Network;Weather;Utility;
+StartupNotify=false
+Name[en_US]=Simple Weather Applet
