@@ -10,3 +10,5 @@ Scripts:
 -	obrecent. A simple Perl script for Openbox which recent documents are displayed through pipe menus.
 -	logout-trayicon. A Python script for Openbox to put a logout icon in system tray of tint2 (or other panels). See http://crunchbang.com/forums/viewtopic.php?pid=132886.
 -	sensors-trayicon. A Python script for Openbox to put a sensor monitor in system tray of tint2 (or other panels).
+-	weatherboy. A simple application shows weather information in a systemt tray icon of tint2 (or other panels) using Yahoo! News Weather API. See https://github.com/decayofmind/weatherboy.
+-	weatherboy-qt. A review of weatherboy application to migrate to Qt5 and Python3.
