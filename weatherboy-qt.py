@@ -51,7 +51,7 @@ PUBLIC_API_URL = 'http://query.yahooapis.com/v1/public/yql'
 YQL_FORECAST_BY_WOEID = "select * from weather.forecast where woeid='%s' and u='%s'"
 
 # Application version
-VERSION = 1.1
+VERSION = 1.2
 
 # Icon name by Yahoo! Weather code
 ICON_NAMES = {
@@ -143,7 +143,7 @@ class YahooAPI(object):
 
 class SystemTrayIcon(QSystemTrayIcon):
     def __init__(self, parent=None):
-        QSystemTrayIcon.__init__(self, QIcon.fromTheme('dialog-question', QIcon.('stock-dialog-question')), parent)
+        QSystemTrayIcon.__init__(self, QIcon.fromTheme('dialog-question', QIcon('stock-dialog-question')), parent)
 
         # Notification
         notify2.init('weather-qt')
@@ -156,8 +156,10 @@ class SystemTrayIcon(QSystemTrayIcon):
         open_action = QAction(self.tr('&Open website'), self)
         open_action.triggered.connect(parent.on_open_website)
         about_action = QAction(self.tr('&About'), self)
+        about_action.setIcon(QIcon.fromTheme("help-about"))        
         about_action.triggered.connect(parent.on_about)
         quit_action = QAction(self.tr('&Exit'), self)
+        quit_action.setIcon(QIcon.fromTheme("application-exit"))
         quit_action.triggered.connect(parent.on_quit)
 
         traymenu = QMenu()
