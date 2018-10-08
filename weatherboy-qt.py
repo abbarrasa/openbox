@@ -18,7 +18,7 @@
 #
 # License: GPLv2
 # Date: 12 Oct 2017
-# Latest edit: 14 Oct 2017
+# Latest edit: 8 Oct 2018
 # Website: https://github.com/abbarrasa/openbox
 #
 # A review of Weatherboy application to migrate to Qt5 and Python3.
