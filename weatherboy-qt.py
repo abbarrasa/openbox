@@ -103,7 +103,7 @@ ICON_NAMES = {
     '45': 'weather-storm',
     '46': 'weather-snow',
     '47': 'weather-storm',
-    '3200': 'stock-unknown'
+    '3200': 'weather-none-available'
 }
 
 
@@ -143,7 +143,7 @@ class YahooAPI(object):
 
 class SystemTrayIcon(QSystemTrayIcon):
     def __init__(self, parent=None):
-        QSystemTrayIcon.__init__(self, QIcon.fromTheme('stock-dialog-question'), parent)
+        QSystemTrayIcon.__init__(self, QIcon.fromTheme('dialog-question', QIcon.('stock-dialog-question')), parent)
 
         # Notification
         notify2.init('weather-qt')
@@ -181,7 +181,7 @@ class SystemTrayIcon(QSystemTrayIcon):
 
     def error(self, e):
         msg = str(e)
-        self.setIcon(QIcon.fromTheme('stock-dialog-error'))
+        self.setIcon(QIcon.fromTheme('dialog-error', QIcon('stock-dialog-error')))
         self.setToolTip(msg)
 
         n = notify2.Notification('Weatherboy-Qt error!', msg, 'stock-dialog-error')
