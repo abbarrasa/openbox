@@ -110,8 +110,7 @@ class MainApp(QMainWindow):
             <p>You should have received a copy of the GNU General Public
             License along with this program. If not, see
             <a href="https://www.gnu.org/licenses/gpl-3.0.html">
-            https://www.gnu.org/licenses/gpl-3.0.html</a>.</p>""")
-
+            GNU General Public License version 3</a>.</p>""")
         layout = QVBoxLayout()
         titleLayout = QHBoxLayout()
         titleLabel = QLabel('<font size="4"><b>{0} {1}</b></font>'.format('Webcam Manager', VERSION))
