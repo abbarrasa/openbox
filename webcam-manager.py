@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# This program is free software; you can redistribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -12,13 +12,12 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA 02110-1301, USA.
+# along with this program.  If not, see
+# <https://www.gnu.org/licenses/gpl-3.0.html>.
 #
-# License: GPLv2
+# License: GPLv3
 # Date: 9 Oct 2018
-# Latest edit: 9 Oct 2018
+# Latest edit: 10 Oct 2018
 # Website: https://github.com/abbarrasa/openbox
 #
 # A system tray icon application written in Python and Qt5 used to
@@ -38,26 +37,24 @@ import distutils.spawn
 
 
 # Application version
-VERSION = 1.0
+VERSION = 1.1
 
 class MainApp(QMainWindow):
     tray_icon = None
     active = False
 
     def __init__(self, parent=None):
-        super(MainApp, self).__init__()
+        super(MainApp, self).__init__(parent)
 
         # Init notification
         notify2.init('webcam-manager')
         
         # Init tray icon
+        self.tray_icon = QSystemTrayIcon(QIcon.fromTheme('camera-web'), parent)        
         self.initTrayIcon()
-
+        self.tray_icon.show()        
         
     def initTrayIcon(self):
-        # Init QSystemTrayIcon
-        self.tray_icon = QSystemTrayIcon(self)
-
         # Menu actions
         toogle_action = QAction(self.tr('&Toogle'), self)
         toogle_action.triggered.connect(self.onToogle)
@@ -80,7 +77,6 @@ class MainApp(QMainWindow):
             self.updateTrayIcon(True)
         else:
             self.updateTrayIcon(False)        
-        self.tray_icon.show()          
 
     def onToogle(self, widget):
         if self.active:
@@ -101,19 +97,20 @@ class MainApp(QMainWindow):
             feel free to open an issue in <a href="https://github.com/abbarrasa/openbox/issues">
             github</a>.""")
         creditsText = self.tr("""(c) 2018 Alberto Buitrago <%s>""") % base64.b64decode('YWJiYXJyYXNhQGdtYWlsLmNvbQ==').decode('utf-8')
-        licenseText = self.tr("""<p>This program is free software; you can
-            redistribute it and/or modify it under the terms of the GNU
-            General Public License as published by the free Software
-            Foundation, either version 2 of the License, or (at your option)
-            any later version.</p>
-            <p>This program is distributed in the hope that it will be useful,
-            but WITHOUT ANY WARRANTY; without even the implied warranty of
-            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-            General Public License for more details.</p>
+        licenseText = self.tr("""<p>This program is free software: you
+            can redistribute it and/or modify it under the terms of the
+            GNU General Public License as published by the Free Software
+            Foundation, either version 3 of the License, or (at your
+            option) any later version.</p>
+            <p>This program is distributed in the hope that it will be
+            useful, but WITHOUT ANY WARRANTY; without even the implied
+            warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+            PURPOSE. See the GNU General Public License for more
+            details.</p>
             <p>You should have received a copy of the GNU General Public
             License along with this program. If not, see
-            <a href="http://www.gnu.org/licenses/gpl-2.0.html">GNU General Public
-            License version 2</a>.</p>""")
+            <a href="https://www.gnu.org/licenses/gpl-3.0.html">
+            https://www.gnu.org/licenses/gpl-3.0.html</a>.</p>""")
 
         layout = QVBoxLayout()
         titleLayout = QHBoxLayout()
@@ -168,16 +165,19 @@ class MainApp(QMainWindow):
         tool = self.getGUISudo()
         cmd = '%s modprobe -a uvcvideo' % tool
         self.execCommand(cmd)
-        self.active = True
-        self.updateTrayIcon(True)
-        self.showNotification('Webcam enabled!', 'Webcam is turned on and ready to use')
+        output = int(self.execCommand('lsmod | grep uvcvideo | wc -l').split()[0])
+        if output > 0:
+            self.updateTrayIcon(True)
+            self.showNotification('Webcam enabled!', 'Webcam is turned on and ready to use')
         
     def disable(self):
         tool = self.getGUISudo()
         cmd = '%s modprobe -r uvcvideo' % tool
         self.execCommand(cmd)
-        self.updateTrayIcon(False)
-        self.showNotification('Webcam disabled!', 'Webcam is turned off')
+        output = int(self.execCommand('lsmod | grep uvcvideo | wc -l').split()[0])
+        if output == 0:
+            self.updateTrayIcon(False)
+            self.showNotification('Webcam disabled!', 'Webcam is turned off')
         
     def getGUISudo(self):
         tools = ['kdesu', 'lxqt-sudo', 'gksu', 'gksudo', 'pkexec', 'sudo']
@@ -211,7 +211,9 @@ if __name__ == "__main__":
     import sys
     try:
         app = QApplication(sys.argv)
-        tray_icon = MainApp()
+        QApplication.setQuitOnLastWindowClosed(False)      
+        mw = MainApp()
         sys.exit(app.exec())
     except KeyboardInterrupt:
         pass
+   
