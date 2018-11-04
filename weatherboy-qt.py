@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# This program is free software; you can redistribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
@@ -12,13 +12,12 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-# MA 02110-1301, USA.
+# along with this program.  If not, see
+# <https://www.gnu.org/licenses/gpl-3.0.html>.
 #
-# License: GPLv2
+# License: GPLv3
 # Date: 12 Oct 2017
-# Latest edit: 8 Oct 2018
+# Latest edit: 10 Oct 2018
 # Website: https://github.com/abbarrasa/openbox
 #
 # A review of Weatherboy application to migrate to Qt5 and Python3.
@@ -51,7 +50,7 @@ PUBLIC_API_URL = 'http://query.yahooapis.com/v1/public/yql'
 YQL_FORECAST_BY_WOEID = "select * from weather.forecast where woeid='%s' and u='%s'"
 
 # Application version
-VERSION = 1.2
+VERSION = 1.3
 
 # Icon name by Yahoo! Weather code
 ICON_NAMES = {
@@ -145,12 +144,11 @@ class SystemTrayIcon(QSystemTrayIcon):
     def __init__(self, parent=None):
         QSystemTrayIcon.__init__(self, QIcon.fromTheme('dialog-question', QIcon('stock-dialog-question')), parent)
 
-        # Notification
-        notify2.init('weather-qt')
-
         # Menu actions
         refresh_action = QAction(self.tr('&Refresh'), self)
         refresh_action.triggered.connect(parent.on_refresh)
+        location_action = QAction(self.tr('&Change location'), self)
+        location_action.triggered.connect(parent.on_change_location)
         overview_action = QAction(self.tr('&Show overview'), self)
         overview_action.triggered.connect(parent.on_show_overview)
         open_action = QAction(self.tr('&Open website'), self)
@@ -164,6 +162,7 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         traymenu = QMenu()
         traymenu.addAction(refresh_action)
+        traymenu.addAction(location_action)
         traymenu.addAction(overview_action)
         traymenu.addSeparator()
         traymenu.addAction(open_action)
@@ -196,6 +195,11 @@ class MainApp(QMainWindow):
 
         self.args = args
         self.api = YahooAPI()
+
+        # Init notficiations
+        notify2.init('weather-qt')
+
+        # Init tray icon
         self.trayicon = SystemTrayIcon(self)
 
         self.timer = QTimer(self)
@@ -220,7 +224,7 @@ class MainApp(QMainWindow):
             dialog = QDialog(self)
             dialog.setWindowTitle('Weather status')
             dialog.setGeometry(300, 300, 640, 480)
-            dialog.setWindowIcon(QIcon.fromTheme('help-about'))
+            dialog.setWindowIcon(QIcon.fromTheme('indicator-weather', QIcon(':/indicator-weather.png')))
 
             conditionsLayout = QVBoxLayout()
             weatherLabel = QLabel('<font size="4"><b>{0} ({1})</b></font>'.format(data['current']['temp'], data['current']['text']))
@@ -298,6 +302,14 @@ class MainApp(QMainWindow):
             print(str(e))
             self.trayicon.error(e)
 
+    def on_change_location(self, widget):
+        print("Opening a new popup window...")
+        dialog = QDialog(self)
+        dialog.setWindowTitle('Change location')
+        dialog.setGeometry(300, 300, 640, 480)
+        dialog.setWindowIcon(QIcon.fromTheme('indicator-weather', QIcon(':/indicator-weather.png')))
+        dialog.show()
+
     def on_about(self, widget):
         dialog = QDialog(self)
         aboutText = self.tr("""<p>A simple weather information applet.</p>
@@ -310,20 +322,20 @@ class MainApp(QMainWindow):
             feel free to open an issue in <a href="https://github.com/abbarrasa/openbox/issues">
             github</a>.""")
         creditsText = self.tr("""(c) 2017 Alberto Buitrago <%s>""") % base64.b64decode('YWJiYXJyYXNhQGdtYWlsLmNvbQ==').decode('utf-8')
-        licenseText = self.tr("""<p>This program is free software; you can
-            redistribute it and/or modify it under the terms of the GNU
-            General Public License as published by the free Software
-            Foundation, either version 2 of the License, or (at your option)
-            any later version.</p>
-            <p>This program is distributed in the hope that it will be useful,
-            but WITHOUT ANY WARRANTY; without even the implied warranty of
-            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-            General Public License for more details.</p>
+        licenseText = self.tr("""<p>This program is free software: you
+            can redistribute it and/or modify it under the terms of the
+            GNU General Public License as published by the Free Software
+            Foundation, either version 3 of the License, or (at your
+            option) any later version.</p>
+            <p>This program is distributed in the hope that it will be
+            useful, but WITHOUT ANY WARRANTY; without even the implied
+            warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+            PURPOSE. See the GNU General Public License for more
+            details.</p>
             <p>You should have received a copy of the GNU General Public
             License along with this program. If not, see
-            <a href="http://www.gnu.org/licenses/gpl-2.0.html">GNU General Public
-            License version 2</a>.</p>""")
-
+            <a href="https://www.gnu.org/licenses/gpl-3.0.html">
+            GNU General Public License version 3</a>.</p>""")
         layout = QVBoxLayout()
         titleLayout = QHBoxLayout()
         titleLabel = QLabel('<font size="4"><b>{0} {1}</b></font>'.format('Weatherboy-qt', VERSION))
@@ -350,7 +362,7 @@ class MainApp(QMainWindow):
         creditsBrowser.moveCursor(QTextCursor.Start)
         licenseBrowser.moveCursor(QTextCursor.Start)
 
-        icon = QIcon.fromTheme('indicator-weather')
+        icon = QIcon.fromTheme('indicator-weather', QIcon(':/indicator-weather.png'))
         pixmap = icon.pixmap(QSize(64, 64))
         imageLabel = QLabel()
         imageLabel.setPixmap(pixmap)
