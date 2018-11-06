@@ -33,7 +33,8 @@ from PyQt5.QtGui import QIcon, QTextCursor
 from PyQt5.QtWidgets import (qApp, QApplication, QMainWindow,
     QSystemTrayIcon, QMenu, QAction, QDialog, QDialogButtonBox,
     QLabel, QTabWidget, QTextBrowser, QGridLayout, QHBoxLayout,
-    QVBoxLayout)
+    QVBoxLayout, QToolButton, QLineEdit, QSpacerItem, QSizePolicy,
+    QListView)
 from argparse import ArgumentParser
 import urllib.request
 import urllib.parse
@@ -310,26 +311,26 @@ class MainApp(QMainWindow):
         dialog.setGeometry(300, 300, 600, 480)
         dialog.setWindowIcon(QIcon.fromTheme('indicator-weather', QIcon(':/indicator-weather.png')))
         
-        verticalLayout = QtWidgets.QVBoxLayout()
-        gridLayout = QtWidgets.QGridLayout()
-        textLabel = QtWidgets.QLabel("Find location:")
+        verticalLayout = QVBoxLayout()
+        gridLayout = QGridLayout()
+        textLabel = QLabel("Find location:")
         gridLayout.addWidget(self.TextLabel, 0, 0, 1, 1)
-        toolButton = QtWidgets.QToolButton()
+        toolButton = QToolButton()
         toolButton.setText("Search")
         gridLayout.addWidget(toolButton, 0, 2, 1, 1)
-        lineEdit = QtWidgets.QLineEdit()
+        lineEdit = QLineEdit()
         gridLayout.addWidget(lineEdit, 0, 1, 1, 1)
         toolButton.clicked.connect(lambda checked, text=lineEdit.text(): self.search(text))
         verticalLayout.addLayout(gridLayout)
-        spacerItem = QtWidgets.QSpacerItem(10, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
+        spacerItem = QSpacerItem(10, 10, QSizePolicy.Minimum, QSizePolicy.Preferred)
         verticalLayout.addItem(spacerItem)
         label = QtWidgets.QLabel("Select your location:")
         verticalLayout.addWidget(label)
-        listView = QtWidgets.QListView()
+        listView = QListView()
         verticalLayout.addWidget(listView)
-        buttonBox = QtWidgets.QDialogButtonBox()
-        buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Save)
+        buttonBox = QDialogButtonBox()
+        buttonBox.setOrientation(Qt.Horizontal)
+        buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Save)
         verticalLayout.addWidget(self.buttonBox)
         dialog.setLayout(verticalLayout)
                 
