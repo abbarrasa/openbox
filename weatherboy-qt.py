@@ -48,6 +48,7 @@ from datetime import datetime, time
 WEATHER_WEBSITE = 'https://www.yahoo.com/news/weather/country/state/city-%s'
 PUBLIC_API_URL = 'http://query.yahooapis.com/v1/public/yql'
 YQL_FORECAST_BY_WOEID = "select * from weather.forecast where woeid='%s' and u='%s'"
+YQL_LOCATION_BY_TEXT = "select woeid, name, country.content, admin1.content, admin2.content from geo.places(10) where text='%s'"
 
 # Application version
 VERSION = 1.3
@@ -314,10 +315,11 @@ class MainApp(QMainWindow):
         textLabel = QtWidgets.QLabel("Find location:")
         gridLayout.addWidget(self.TextLabel, 0, 0, 1, 1)
         toolButton = QtWidgets.QToolButton()
-        toolButton.setText("Search")               
+        toolButton.setText("Search")
         gridLayout.addWidget(toolButton, 0, 2, 1, 1)
         lineEdit = QtWidgets.QLineEdit()
         gridLayout.addWidget(lineEdit, 0, 1, 1, 1)
+        toolButton.clicked.connect(lambda checked, text=lineEdit.text(): self.search(text))
         verticalLayout.addLayout(gridLayout)
         spacerItem = QtWidgets.QSpacerItem(10, 10, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
         verticalLayout.addItem(spacerItem)
@@ -489,7 +491,12 @@ class MainApp(QMainWindow):
         if p.lower() == 'pm':
             h += 12
         return time(h, m)
-
+    
+    def search(self, text):
+        yql = YQL_LOCATION_BY_TEXT % (text)
+        data = self.api.query(yql)
+        print(data)
+        
 
 if __name__ == "__main__":
     import sys
