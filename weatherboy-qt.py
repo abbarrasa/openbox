@@ -314,7 +314,7 @@ class MainApp(QMainWindow):
         verticalLayout = QVBoxLayout()
         gridLayout = QGridLayout()
         textLabel = QLabel("Find location:")
-        gridLayout.addWidget(self.TextLabel, 0, 0, 1, 1)
+        gridLayout.addWidget(textLabel, 0, 0, 1, 1)
         toolButton = QToolButton()
         toolButton.setText("Search")
         gridLayout.addWidget(toolButton, 0, 2, 1, 1)
@@ -331,7 +331,7 @@ class MainApp(QMainWindow):
         buttonBox = QDialogButtonBox()
         buttonBox.setOrientation(Qt.Horizontal)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Save)
-        verticalLayout.addWidget(self.buttonBox)
+        verticalLayout.addWidget(buttonBox)
         dialog.setLayout(verticalLayout)
                 
         dialog.show()
