@@ -318,9 +318,9 @@ class MainApp(QMainWindow):
         toolButton = QToolButton()
         toolButton.setText("Search")
         gridLayout.addWidget(toolButton, 0, 2, 1, 1)
-        lineEdit = QLineEdit()
-        gridLayout.addWidget(lineEdit, 0, 1, 1, 1)
-        toolButton.clicked.connect(lambda checked, text=lineEdit.text(): self.search(text))
+        self.editSearch = QLineEdit()
+        gridLayout.addWidget(self.editSearch, 0, 1, 1, 1)
+        toolButton.clicked.connect(self.search)
         verticalLayout.addLayout(gridLayout)
         spacerItem = QSpacerItem(10, 10, QSizePolicy.Minimum, QSizePolicy.Preferred)
         verticalLayout.addItem(spacerItem)
@@ -493,8 +493,9 @@ class MainApp(QMainWindow):
             h += 12
         return time(h, m)
     
-    def search(self, text):
-        yql = YQL_LOCATION_BY_TEXT % (text)
+    def search(self):
+        yql = YQL_LOCATION_BY_TEXT % (self.editSearch.text())
+        print(yql)
         data = self.api.query(yql)
         print(data)
         
