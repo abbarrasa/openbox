@@ -17,7 +17,7 @@
 #
 # License: GPLv3
 # Date: 12 Oct 2017
-# Latest edit: 10 Oct 2018
+# Latest edit: 6 Nov 2018
 # Website: https://github.com/abbarrasa/openbox
 #
 # A review of Weatherboy application to migrate to Qt5 and Python3.
@@ -29,7 +29,8 @@
 # Example of use: python3 weatherboy-qt.py -l 22664159 -u c -d 30 -a
 
 from PyQt5.QtCore import QSize, QTimer, Qt
-from PyQt5.QtGui import QIcon, QTextCursor
+from PyQt5.QtGui import (QIcon, QTextCursor, QStandardItemModel,
+    QStandardItem)
 from PyQt5.QtWidgets import (qApp, QApplication, QMainWindow,
     QSystemTrayIcon, QMenu, QAction, QDialog, QDialogButtonBox,
     QLabel, QTabWidget, QTextBrowser, QGridLayout, QHBoxLayout,
@@ -52,7 +53,7 @@ YQL_FORECAST_BY_WOEID = "select * from weather.forecast where woeid='%s' and u='
 YQL_LOCATION_BY_TEXT = "select woeid, name, country.content, admin1.content, admin2.content from geo.places(10) where text='%s'"
 
 # Application version
-VERSION = 1.3
+VERSION = 1.4
 
 # Icon name by Yahoo! Weather code
 ICON_NAMES = {
@@ -307,10 +308,6 @@ class MainApp(QMainWindow):
     def on_change_location(self, widget):
         print("Opening a new popup window...")
         dialog = QDialog(self)
-        dialog.setWindowTitle('Change location')
-        dialog.setGeometry(300, 300, 600, 480)
-        dialog.setWindowIcon(QIcon.fromTheme('indicator-weather', QIcon(':/indicator-weather.png')))
-        
         verticalLayout = QVBoxLayout()
         gridLayout = QGridLayout()
         textLabel = QLabel("Find location:")
@@ -324,16 +321,23 @@ class MainApp(QMainWindow):
         verticalLayout.addLayout(gridLayout)
         spacerItem = QSpacerItem(10, 10, QSizePolicy.Minimum, QSizePolicy.Preferred)
         verticalLayout.addItem(spacerItem)
-        label = QtWidgets.QLabel("Select your location:")
+        label = QLabel("Select your location:")
         verticalLayout.addWidget(label)
-        listView = QListView()
-        verticalLayout.addWidget(listView)
+        self.searchResults = QListView()
+        verticalLayout.addWidget(self.searchResults)
         buttonBox = QDialogButtonBox()
         buttonBox.setOrientation(Qt.Horizontal)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Save)
         verticalLayout.addWidget(buttonBox)
+        buttonBox.rejected.connect(dialog.reject)
+        buttonBox.accepted.connect(
+            lambda dialog=dialog: self.save_location(dialog))
+
         dialog.setLayout(verticalLayout)
-                
+        dialog.setWindowTitle('Change location')
+        dialog.setGeometry(300, 300, 600, 480)
+        dialog.setWindowIcon(QIcon.fromTheme('indicator-weather', QIcon(':/indicator-weather.png')))
+
         dialog.show()
 
     def on_about(self, widget):
@@ -492,13 +496,45 @@ class MainApp(QMainWindow):
         if p.lower() == 'pm':
             h += 12
         return time(h, m)
-    
+
     def search(self):
-        yql = YQL_LOCATION_BY_TEXT % (self.editSearch.text())
-        print(yql)
-        data = self.api.query(yql)
-        print(data)
-        
+        try:
+            yql = YQL_LOCATION_BY_TEXT % (self.editSearch.text())
+            data = self.api.query(yql)
+            ns = {}
+            count = data['query']['count']
+            if count == 1:
+                place = data['query']['results']['place']
+                value = '{0}, {1}, {2}, {3}'.format(place['name'], place['admin2'], place['admin1'], place['country'])
+                woeid = place['woeid']
+                ns[woeid] = value
+            elif count > 1:
+                for place in data['query']['results']['place']:
+                    value = '{0}, {1}, {2}, {3}'.format(place['name'], place['admin2'], place['admin1'], place['country'])
+                    woeid = place['woeid']
+                    ns[woeid] = value
+
+            model = QStandardItemModel()
+            for key, value in ns.items():
+                item = QStandardItem(value)
+                item.setData(str(key), Qt.UserRole)
+                model.appendRow(item)
+
+            self.searchResults.setModel(model)
+
+        except Exception as e:
+            print(str(e))
+            self.trayicon.error(e)
+
+    def save_location(self, dialog):
+        selected = self.searchResults.selectedIndexes()
+        if len(selected) == 1:
+            woeid = selected[0].data(Qt.UserRole)
+            self.args.location = woeid
+            self.refresh()
+
+        dialog.close()
+
 
 if __name__ == "__main__":
     import sys
