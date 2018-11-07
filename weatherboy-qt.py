@@ -17,7 +17,7 @@
 #
 # License: GPLv3
 # Date: 12 Oct 2017
-# Latest edit: 6 Nov 2018
+# Latest edit: 7 Nov 2018
 # Website: https://github.com/abbarrasa/openbox
 #
 # A review of Weatherboy application to migrate to Qt5 and Python3.
@@ -505,19 +505,15 @@ class MainApp(QMainWindow):
             count = data['query']['count']
             if count == 1:
                 place = data['query']['results']['place']
-                value = '{0}, {1}, {2}, {3}'.format(place['name'], place['admin2'], place['admin1'], place['country'])
-                woeid = place['woeid']
-                ns[woeid] = value
+                self.append_place(ns, place)
             elif count > 1:
                 for place in data['query']['results']['place']:
-                    value = '{0}, {1}, {2}, {3}'.format(place['name'], place['admin2'], place['admin1'], place['country'])
-                    woeid = place['woeid']
-                    ns[woeid] = value
+                    self.append_place(ns, place)
 
             model = QStandardItemModel()
-            for key, value in ns.items():
+            for woeid, value in ns.items():
                 item = QStandardItem(value)
-                item.setData(str(key), Qt.UserRole)
+                item.setData(str(woeid), Qt.UserRole)
                 model.appendRow(item)
 
             self.searchResults.setModel(model)
@@ -534,7 +530,12 @@ class MainApp(QMainWindow):
             self.refresh()
 
         dialog.close()
-
+        
+    def append_place(self, list, place):
+        value = '{0}, {1}, {2}, {3}'.format(place['name'], place['admin2'], place['admin1'], place['country'])
+        woeid = place['woeid']
+        list[woeid] = value
+                    
 
 if __name__ == "__main__":
     import sys
